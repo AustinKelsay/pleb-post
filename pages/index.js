@@ -6,46 +6,30 @@ import axios from "axios";
 
 export default function Home() {
   const { data: session, status } = useSession();
-  const [user, setUser] = useState(null);
   const [userBalance, setUserBalance] = useState(null);
 
   useEffect(() => {
-    console.log(session);
-  }, [session]);
-
-  useEffect(() => {
-    if (!session) return;
-
-    axios
-      .get(`http://localhost:3000/api/users/${session.user.username}`)
-      .then((res) => {
-        console.log("res", res);
-        setUser(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [session]);
-
-  useEffect(() => {
-    if (!user) return;
+    if (!session?.user) return;
 
     const headers = {
       "Content-Type": "application/json",
-      "X-Api-Key": user.in_key,
+      "X-Api-Key": session.user.in_key,
     };
 
     axios
-      .get(`https://b75b808c74.d.voltageapp.io/api/v1/wallet`, { headers })
+      .get(`https://d42da20dc9.d.voltageapp.io/api/v1/wallet`, {
+        headers,
+      })
       .then((res) => {
         console.log("user wallet res", res);
 
         setUserBalance(res.data.balance / 1000);
       })
       .catch((err) => {
+        console.log("user wallet err");
         console.log(err);
       });
-  }, [user]);
+  }, [session]);
 
   return (
     <>
