@@ -2,34 +2,13 @@ import { useEffect, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import { useSession, signIn, signOut } from "next-auth/react";
-import axios from "axios";
+import PostsList from "../src/components/posts/postsList";
+import PostForm from "../src/components/posts/postForm";
+import { Button } from "@chakra-ui/react";
 
 export default function Home() {
   const { data: session, status } = useSession();
-  const [userBalance, setUserBalance] = useState(null);
-
-  useEffect(() => {
-    if (!session?.user) return;
-
-    const headers = {
-      "Content-Type": "application/json",
-      "X-Api-Key": session.user.in_key,
-    };
-
-    axios
-      .get(`https://d42da20dc9.d.voltageapp.io/api/v1/wallet`, {
-        headers,
-      })
-      .then((res) => {
-        console.log("user wallet res", res);
-
-        setUserBalance(res.data.balance / 1000);
-      })
-      .catch((err) => {
-        console.log("user wallet err");
-        console.log(err);
-      });
-  }, [session]);
+  const [showForm, setShowForm] = useState(false);
 
   return (
     <>
@@ -40,12 +19,11 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <h1>
-          {status} / Balance {userBalance}
-        </h1>
-
-        <button onClick={() => signIn()}>login</button>
-        <button onClick={() => signOut()}>logout</button>
+        <Button colorScheme={"blue"} onClick={() => setShowForm(!showForm)}>
+          Add post
+        </Button>
+        {showForm && <PostForm />}
+        <PostsList />
       </main>
     </>
   );
